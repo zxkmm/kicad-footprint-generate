@@ -4,6 +4,7 @@ This is an AI skill based on the open Agent Skills standard. It empowers your AI
 
 ![screenshot](image.png)
 ![screenshot2](image-1.png)
+![screenshot3](image-2.png)
 
 ## 📦 Directory Structure
 
