@@ -17,6 +17,7 @@ When you are called to execute this task, strictly follow these steps:
 6. **Output & Placement**: 
    - The default added output directory on Linux is usually `/home/USER_NAME/.local/share/kicad/KICAD_VERSION/scripting`, you should detect correct path (just use filesystem tool like `ls` or `dir` in specific paths, DO NOT run KiCad etc.) and output the generated script there. If it doesn't exist, create it, or ask user to run command, when see permission issues or environment path issues, to create it manually.
     - Provide clear instructions on how to run the generated script using KiCad's footprint wizard.
+    - Guide user that if python runtime error occurs, copy the error message back and you will fix the script, then ask user to run it again.
 
 # 🚫 Constraints
 - **NEVER** use generic or placeholder values for dimensions if the data is available in the provided specification, **just hardcode the actual values into the script, one script, one footprint**.

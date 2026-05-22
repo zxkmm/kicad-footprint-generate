@@ -14,7 +14,6 @@ kicad-footprint-generator/
 ├── templates/
 │   └── kicad_footprint_demo.py       # Official KiCad script template (the Agent uses this for API reference)
 └── resources/                        # (Optional) Additional IPC naming conventions, etc.
-
 ```
 
 ---
@@ -33,13 +32,8 @@ Claude Code automatically loads skills located in the .claude/skills/ directory 
 2. Copy the entire kicad-footprint-generator folder into it.
 ```bash
 cp -r kicad-footprint-generator .claude/skills/
-
-
 ```
 
-
-
-```
 3. Launch claude in your terminal. When you mention "generate KiCad footprint" in the chat or input /kicad-footprint-generator, Claude will automatically load the skill.
 
 ### 2. Google Antigravity / Gemini CLI
