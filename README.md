@@ -9,9 +9,15 @@ This is an AI skill based on the open Agent Skills standard. It empowers your AI
 
 ```text
 kicad-footprint-generator/
-├── SKILL.md                          # Core instructions and trigger conditions for the skill
-├── templates/
-│   └── DEMO FILES ...                # Official KiCad script template (the Agent uses this for 
+├── SKILL.md                          # Core identity and high-level workflow
+├── docs/                             # Modular documentation and references
+│   ├── GUIDE.md                      # Detailed generation procedures
+│   ├── API_REFERENCE.md              # KiCad Python API and template mapping
+│   ├── ENVIRONMENT.md                # Path detection and deployment guide
+│   ├── VERIFICATION.md               # Mandatory testing workflow
+│   └── EXAMPLES.md                   # Reference implementations
+├── templates/                        # Official KiCad script blueprints
+│   └── ...                           # Python templates (QFP, BGA, etc.)
 ```
 
 ---
