@@ -71,4 +71,5 @@ Once installed, you don't need to write any complex or tedious prompts. Simply p
 **Example Conversation:**
 
 > **You:** "Here is a screenshot of the datasheet for my IC."
+
 > **Agent:** *(Silently reads SKILL.md and kicad_footprint_demo.py, then outputs a ready-to-execute Python script for you)*
