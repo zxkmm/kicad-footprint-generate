@@ -6,14 +6,11 @@ This is an AI skill based on the open Agent Skills standard. It empowers your AI
 
 ## 📦 Directory Structure
 
-Please ensure your Skill folder contains the following structure:
-
 ```text
 kicad-footprint-generator/
 ├── SKILL.md                          # Core instructions and trigger conditions for the skill
 ├── templates/
-│   └── kicad_footprint_demo.py       # Official KiCad script template (the Agent uses this for API reference)
-└── resources/                        # (Optional) Additional IPC naming conventions, etc.
+│   └── DEMO FILES ...                # Official KiCad script template (the Agent uses this for 
 ```
 
 ---
