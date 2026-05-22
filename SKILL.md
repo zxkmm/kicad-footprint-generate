@@ -15,7 +15,7 @@ When you are called to execute this task, strictly follow these steps:
 4. **Generate the Script**: Write a new Python script where all extracted packaging dimensions and coordinates are **hardcoded**. The user should not need to pass any arguments to run it. 
 5. **Embed Metadata**: Ensure the generated script correctly records and attaches metadata (Description, Keywords/Tags, SMD/Through-Hole attributes) so the KiCad EDA tool can correctly read and filter the footprint in its library browser.
 6. **Output & Placement**: 
-   - The default added output directory on Linux is usually `/home/USER_NAME/.local/share/kicad/KICAD_VERSION/scripting`, you should detect it's existence and output the generated script there. If it doesn't exist, create it, or ask user to run command, when see permission issues or environment path issues, to create it manually.
+   - The default added output directory on Linux is usually `/home/USER_NAME/.local/share/kicad/KICAD_VERSION/scripting`, you should detect correct path (just use filesystem tool like `ls` or `dir` in specific paths, DO NOT run KiCad etc.) and output the generated script there. If it doesn't exist, create it, or ask user to run command, when see permission issues or environment path issues, to create it manually.
     - Provide clear instructions on how to run the generated script using KiCad's footprint wizard.
 
 # 🚫 Constraints
