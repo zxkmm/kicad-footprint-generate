@@ -408,4 +408,163 @@ AD9361_Wizard().register()
 ```
 
 **Instruction to User**:
-"I have generated the `P8X32A-M44_QFN` footprint script. It has been placed in `~/.local/share/kicad/8.0/scripting/plugins/`. You can now use the KiCad Footprint Wizard to generate the footprint."
+"I have generated the `AD9361BBCZ-BGA-144` footprint script. It has been placed in `~/.local/share/kicad/10.0/scripting/plugins/`. You can now use the KiCad Footprint Wizard to generate the footprint."
+
+## Example 3: XC7Z020-2CLG484I BGA (484-pin)
+
+**Scenario**: User provides a datasheet and packaging info PDF for a 484-pin BGA chip.
+
+**Generated Script Snippet**:
+```python
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+
+from __future__ import division
+import pcbnew
+import FootprintWizardBase
+import PadArray as PA
+
+class CLG484PadGridArray(PA.PadGridArray):
+    def NamingFunction(self, n_x, n_y):
+        # Rows A-AB (omitting I, O, Q, S, X, Z), Columns 1-22
+        # n_y is the row index (0-21)
+        # n_x is the column index (0-21)
+        return "%s%d" % (
+            self.AlphaNameFromNumber(n_y + 1, alphabet="ABCDEFGHJKLMNPRTUVWY"),
+            n_x + 1)
+
+class XC7Z020_CLG484_Wizard(FootprintWizardBase.FootprintWizard):
+    def GetName(self):
+        return "XC7Z020-2CLG484I"
+
+    def GetDescription(self):
+        return "Footprint for Xilinx Zynq-7000 XC7Z020-2CLG484I (0.8mm pitch, 19x19mm body)"
+
+    def GetReferencePrefix(self):
+        return "U"
+
+    def GetValue(self):
+        return "XC7Z020-2CLG484I"
+
+    def GenerateParameterList(self):
+        # All dimensions in mm
+        # Pads
+        self.AddParam("Pads", "pitch", self.uMM, 0.8)
+        self.AddParam("Pads", "size", self.uMM, 0.4)
+        self.AddParam("Pads", "mask_margin", self.uMM, 0.05) # 0.5mm opening means 0.05 margin on each side (0.4 + 2*0.05 = 0.5)
+        self.AddParam("Pads", "columns", self.uInteger, 22)
+        self.AddParam("Pads", "rows", self.uInteger, 22)
+
+        # Package
+        self.AddParam("Package", "width", self.uMM, 19.0)
+        self.AddParam("Package", "length", self.uMM, 19.0)
+        self.AddParam("Package", "margin", self.uMM, 0.25) # Courtyard margin
+
+    def CheckParameters(self):
+        pass
+
+    def BuildThisFootprint(self):
+        pads = self.parameters["Pads"]
+        rows = pads["rows"]
+        cols = pads["columns"]
+        pad_size = pads["size"]
+        pad_pitch = pads["pitch"]
+        mask_margin = pads["mask_margin"]
+
+        # Create the prototypical pad
+        pad_maker = PA.PadMaker(self.module)
+        pad = pad_maker.SMTRoundPad(pad_size)
+        
+        # Set solder mask margin
+        # In KiCad 6+, SetLocalSolderMaskMargin is used.
+        pad.SetLocalSolderMaskMargin(pcbnew.FromMM(mask_margin))
+
+        # Array center is at (0,0)
+        array = CLG484PadGridArray(pad, cols, rows, pad_pitch, pad_pitch)
+        array.AddPadsToModule(self.draw)
+
+        # Draw box outline on F.Fab layer
+        self.draw.SetLayer(pcbnew.F_Fab)
+        ssx = self.parameters['Package']['width'] / 2
+        ssy = self.parameters['Package']['length'] / 2
+        bevel = pcbnew.FromMM(1)
+
+        self.draw.SetLineThickness(pcbnew.FromMM(0.1))
+        self.draw.BoxWithDiagonalAtCorner(0, 0, ssx*2, ssy*2, bevel)
+
+        # Add IPC markings to F.Silk layer
+        self.draw.SetLayer(pcbnew.F_SilkS)
+        self.draw.SetLineThickness(pcbnew.FromMM(0.12))
+        offset = self.draw.GetLineThickness()
+        len_x = 0.5 * ssx
+        len_y = 0.5 * ssy
+
+        edge = [
+            [ssx + offset - len_x, -ssy - offset],
+            [ssx + offset, -ssy - offset],
+            [ssx + offset, -ssy - offset + len_y],
+        ]
+
+        # Draw three square edges
+        self.draw.Polyline(edge)
+        self.draw.Polyline(edge, mirrorY=0)
+        self.draw.Polyline(edge, mirrorX=0, mirrorY=0)
+
+        # Draw pin-1 marker
+        bevel_silk = bevel + offset
+        pin1 = [
+            [-ssx - offset + len_x, -ssy - offset],
+            [-ssx - offset + bevel_silk, -ssy - offset],
+            [-ssx - offset, -ssy - offset + bevel_silk],
+            [-ssx - offset, -ssy - offset + len_y],
+        ]
+        self.draw.Polyline(pin1)
+        self.draw.Circle(-ssx, -ssy, pcbnew.FromMM(0.2), filled=True)
+
+        # Courtyard
+        cmargin = self.parameters['Package']['margin']
+        self.draw.SetLayer(pcbnew.F_CrtYd)
+        sizex = (ssx + cmargin) * 2
+        sizey = (ssy + cmargin) * 2
+        sizex = pcbnew.PutOnGridMM(sizex, 0.1)
+        sizey = pcbnew.PutOnGridMM(sizey, 0.1)
+
+        self.draw.SetLineThickness(pcbnew.FromMM(0.05))
+        self.draw.Box(0, 0, sizex, sizey)
+
+        # Reference and Value
+        text_size = self.GetTextSize()
+        ypos = ssy + text_size
+        self.draw.Value(0, ypos, text_size)
+        self.draw.Reference(0, -ypos, text_size)
+
+        # Extra text on F.Fab
+        extra_text = pcbnew.PCB_TEXT(self.module)
+        extra_text.SetLayer(pcbnew.F_Fab)
+        extra_text.SetPosition(pcbnew.VECTOR2I(0, 0))
+        extra_text.SetTextSize(pcbnew.VECTOR2I(text_size, text_size))
+        extra_text.SetText("${REFERENCE}")
+        self.module.Add(extra_text)
+
+        # Set SMD attribute
+        self.module.SetAttributes(pcbnew.FP_SMD)
+
+# Register the wizard
+XC7Z020_CLG484_Wizard().register()
+```
+
+**Instruction to User**:
+"I have generated the `XC7Z020-2CLG484I-BGA-484` footprint script. It has been placed in `~/.local/share/kicad/9.0/scripting/plugins/`. You can now use the KiCad Footprint Wizard to generate the footprint."

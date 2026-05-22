@@ -5,11 +5,12 @@
 To make the generated footprint available in KiCad's Footprint Wizard, the script must be placed in one of the following directories.
 
 ### Linux (Default Priority)
-1. `~/.local/share/kicad/8.0/scripting/plugins/` (Recommended)
-2. `~/.config/kicad/8.0/scripting/plugins/`
+1. `~/.local/share/kicad/10.0/scripting/plugins/` (Recommended)
+2. `~/.config/kicad/10.0/scripting/plugins/`
 3. `/usr/share/kicad/scripting/plugins/` (Requires sudo)
 
-*Note: Replace `8.0` with the actual installed KiCad version (e.g., `7.0`, `6.0`).*
+*Note: Replace `10.0` with the actual installed KiCad version (e.g., `8.0`, `7.0`).*
+Use `kicad-cli --version`  to check KiCad version, If not avaliable, just guess based on filesystem.
 
 ### Detection Strategy
 Before writing the file, use `ls -d` or `find` to detect the existence of these paths.
