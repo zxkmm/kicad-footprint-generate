@@ -22,6 +22,9 @@ kicad-footprint-generator/
 
 ---
 
+## Requirements
+This skill works the best on Linux or other UNIX based system. It should works fine on Windows but most LLM agents sometimes confuse about powershell or CMD commands on Windows.
+
 ## 🚀 Installation Guide
 
 Since this skill uses the standard SKILL.md format, you can easily install it into various AI Agent CLIs and IDEs that support this standard.
