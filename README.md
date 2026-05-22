@@ -2,6 +2,8 @@
 
 This is an AI skill based on the open Agent Skills standard. It empowers your AI programming assistants (such as Claude Code, Google Antigravity, Gemini CLI, etc.) with the ability to directly read datasheet specifications and generate KiCad footprint scripts.
 
+![screenshot](image.png)
+
 ## 📦 Directory Structure
 
 Please ensure your Skill folder contains the following structure:
