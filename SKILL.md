@@ -22,6 +22,7 @@ When you are called to execute this task, strictly follow these steps:
 - **NEVER** use generic or placeholder values for dimensions if the data is available in the provided specification, **just hardcode the actual values into the script, one script, one footprint**.
 - **MUST** ensure the script generates standard KiCad layers correctly (e.g., `F.Cu`, `F.SilkS`, `F.Mask`, `F.Paste`, `F.CrtYd`).
 - **DO NOT** output explanatory filler; focus entirely on the Python script and the execution instructions.
+- **FAILURE OR INTERRUPTIONS IS ALLOWED** if the provided specifications are incomplete or ambiguous. In such cases, output a clear error message indicating what information is missing, or ask the user to provide the necessary details.
 
 # 💡 Examples
 To help you better understand the expected behavior, here is an example of a correct execution:
