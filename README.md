@@ -73,3 +73,7 @@ Once installed, you don't need to write any complex or tedious prompts. Simply p
 > **You:** "Here is a screenshot of the datasheet for my IC."
 
 > **Agent:** *(Silently reads SKILL.md and kicad_footprint_demo.py, then outputs a ready-to-execute Python script for you)*
+
+## Cautions
+- The reliability and usability of this tool are highly dependent on the capabilities of the AI you are using. When I use GPT-3.4 or above, DeepSeek V4 or above, and the latest version of Claude Opus, I can achieve relatively high-quality results.
+- AI can make mistakes, this tool aims to speed up your workflow (e.g. save your time to manually naming the number of the BGA balls one by one etc ...), manually check is needed, and i'm not responsible for whatever loss this tool created.
