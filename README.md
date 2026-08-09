@@ -37,25 +37,11 @@ Launch any Claude Code session, any model and paste this into it:
 Can you please install this skill for yourself: `https://github.com/zxkmm/kicad-footprint-generate.git`
 ```
 
-### 2. Google Antigravity / Gemini CLI
-Google's Antigravity IDE and Gemini CLI support both workspace-level and global-level skill mounting.
+### 2. Google Antigravity
 
-**Local Installation (Workspace Scope - Current project only):**
-Place the folder into the .agent/skills/ directory at the root of your project.
-```bash
-mkdir -p .agent/skills/
-cp -r kicad-footprint-generator .agent/skills/
-
+Launch any Antigravity CLI session, any model and paste this into it:
 ```
-
-**Global Installation (Global Scope - Available across all projects):**
-If you want the Agent to be able to generate footprints in any project, place it in the global directory:
-
-```bash
-# macOS / Linux
-mkdir -p ~/.gemini/antigravity/skills/
-cp -r kicad-footprint-generator ~/.gemini/antigravity/skills/
-
+Can you please install this skill for yourself: `https://github.com/zxkmm/kicad-footprint-generate.git`
 ```
 
 ### 3. Cursor & Other Open Agent Skills Compatible Tools
