@@ -7,10 +7,9 @@ stress-testing the harness and improving it.
 ---
 
 ```text
-You have a KiCad harness in this repo. Read skills/kicad-harness/SKILL.md and
-skills/kicad-harness/docs/CAPABILITIES.md first — CAPABILITIES.md records what
-KiCad actually exposes, measured on this machine, including several things that
-look like they work and do not.
+You have a KiCad harness in this repo. Read SKILL.md and docs/CAPABILITIES.md
+first — CAPABILITIES.md records what KiCad actually exposes, measured on this
+machine, including several things that look like they work and do not.
 
 Install it if needed with ./setup.sh, then use ./.venv/bin/kh for every command.
 

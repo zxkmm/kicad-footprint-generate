@@ -3,17 +3,15 @@
 Gives an AI coding agent **eyes and hands** on a KiCad project — and a way to
 teach itself.
 
-Two [Agent Skills](https://agentskills.io) live here, plus the Python tool the
-first one drives:
+One [Agent Skill](https://agentskills.io) plus the Python tool behind it. The
+agent can look up real symbols and footprints in your own libraries, read
+positions and nets, render any region of the board or schematic to PNG and
+actually look at it, run DRC/ERC, edit a board open in KiCad over IPC — and,
+when no library has the part, **generate its footprint from the datasheet**.
 
-| Skill | What it does |
-|---|---|
-| [`kicad-harness`](skills/kicad-harness/SKILL.md) | inspect, measure, render and edit boards and schematics — real library ids, positions and nets, PNG renders the agent actually looks at, DRC/ERC as JSON, live IPC into a running KiCad |
-| [`kicad-footprint-generate`](skills/kicad-footprint-generate/SKILL.md) | turn a datasheet (image, PDF or text) into a ready-to-run KiCad footprint script |
-
-> Both repos used to be separate. `kicad-footprint-generate` and the old
-> `kicad-harness` repo are now merged here — this repo is the only one that gets
-> updates.
+> This repo used to be two: `kicad-harness` and `kicad-footprint-generate`.
+> They are one skill now — making a footprint is just what you do when `kh fp`
+> comes back empty. This is the only repo that gets updates.
 
 ## Self-iteration — the point of this repo
 
@@ -24,16 +22,16 @@ documented line turns out to be wrong, a package family needs a rule nobody wrot
 down. Whoever notices should fix it, and the one who notices is the agent,
 mid-task, at the moment it hurt.
 
-So the rule, written into both SKILL.md files: **notice → fix the repo → commit →
-push.** In the same session, not "worth mentioning later". Measured KiCad
-behaviour is the most valuable thing an agent can leave behind, because the next
-one cannot guess it from source.
+So the rule, written into the top of `SKILL.md`: **notice → fix the repo →
+commit → push.** In the same session, not "worth mentioning later". Measured
+KiCad behaviour is the most valuable thing an agent can leave behind, because the
+next one cannot guess it from source.
 
 - **Using it yourself:** clone it, symlink it into your skills directory, and let
   the agent commit. The skill directory *is* the checkout, so its fixes are
   already in git.
-- **Using someone's fork, or no push access:** fork away, that is what forks are
-  for — but please send it back as a PR here. A fix that stays in a fork helps one
+- **Using a fork, or no push access:** fork away, that is what forks are for —
+  but please send it back as a PR here. A fix that stays in a fork helps one
   person; upstream it helps every agent that installs this.
 
 The full protocol — what is worth writing down, which file it goes in, commit
@@ -55,7 +53,7 @@ Things found broken but not fixed are logged in [`ISSUES.md`](ISSUES.md).
 
 ## Demos
 
-### TP4056 battery charge controller — `kicad-harness`
+### TP4056 battery charge controller
 <img width="3346" height="982" alt="image" src="https://github.com/user-attachments/assets/6a149f57-96b4-4861-a5f5-653ce11fe89c" />
 
 Use Claude Opus 5 in Claude Code, with [this prompt](https://gist.github.com/zxkmm/f82bf892a644cc1c30c1e2ab79ce8476);
@@ -72,67 +70,42 @@ Cost (Assume no subscription plan): 350 input, 158.6k output, 22.9m cache read, 
 **Get the demo project** [Here](https://github.com/zxkmm/kicad-harness-demo-board-tp4056);
 The commit `5ca3f4d13f3e9c7d809f661c0eeaeb0bf86a3caf` is untouched project file that generate purely by harness.
 
-### Datasheet to footprint — `kicad-footprint-generate`
+### Footprints, straight off a datasheet
 ![screenshot](docs/img/image-3.png)
 ![screenshot2](docs/img/image-1.png)
 ![screenshot3](docs/img/image-2.png)
-
-## Directory structure
-
-```text
-kicad-harness/
-├── skills/
-│   ├── kicad-harness/              # the board/schematic skill
-│   │   ├── SKILL.md
-│   │   ├── docs/                   # CAPABILITIES, LIVE_API, RECIPES, SCHEMATIC_EDITS
-│   │   └── examples/
-│   └── kicad-footprint-generate/   # the datasheet -> footprint skill
-│       ├── SKILL.md
-│       ├── docs/                   # MEASUREMENT, GUIDE, API_REFERENCE, ENVIRONMENT, VERIFICATION, EXAMPLES
-│       └── templates/              # official KiCad wizard blueprints (QFP, BGA, QFN, ...)
-├── kicad_harness/                  # the Python package behind `kh`
-├── docs/SELF_ITERATION.md          # how the agent maintains this repo
-├── ISSUES.md                       # found-while-dogfooding log
-├── setup.sh
-└── pyproject.toml
-```
 
 ## Requirements
 
 Linux or another UNIX-like system works best. Windows should be fine, but agents
 often confuse PowerShell and CMD syntax there.
 
-The `kicad-harness` skill additionally needs **KiCad 9 or 10** (tested on 10.0.5),
-`kicad-cli`, and `rsvg-convert`. The `kicad-footprint-generate` skill needs only
-KiCad's `pcbnew` Python module.
+Needs **KiCad 9 or 10** (tested on 10.0.5), `kicad-cli`, and `rsvg-convert`.
+Footprint generation needs only KiCad's `pcbnew` Python module.
 
 ## Install
-
-### The skills
 
 Launch a session in any agent that supports the Agent Skills standard — Claude
 Code, Google Antigravity, Gemini CLI, Cursor — and paste:
 
 ```
-Can you please install the skills in this repo for yourself: `https://github.com/zxkmm/kicad-harness.git`
+Can you please install this skill for yourself: `https://github.com/zxkmm/kicad-harness.git`
 ```
 
-Both skill folders under `skills/` are installable; install one or both.
-
-Doing it by hand, for Claude Code — symlink rather than copy, so the agent's own
-fixes land in git:
+By hand, for Claude Code — symlink rather than copy, so the agent's own fixes
+land in git:
 
 ```bash
 git clone https://github.com/zxkmm/kicad-harness.git
-ln -s "$PWD/kicad-harness/skills/kicad-harness"            ~/.claude/skills/kicad-harness
-ln -s "$PWD/kicad-harness/skills/kicad-footprint-generate" ~/.claude/skills/kicad-footprint-generate
+ln -s "$PWD/kicad-harness" ~/.claude/skills/kicad-harness
 ```
 
 For Cursor and other agentskills.io-compatible tools the project-level directory
 is typically `.agent/skills/` — same idea. Then just ask in plain English:
-*"use the kicad harness skill to check this board"*.
+*"check this board"*, *"place these parts"*, *"make a footprint for this
+datasheet"*.
 
-### The `kh` tool (only for the `kicad-harness` skill)
+Then install the `kh` tool:
 
 ```bash
 ./setup.sh
@@ -144,7 +117,7 @@ KiCad into the system interpreter and cannot be pip-installed.
 For the live layer, enable the API server in KiCad:
 **Preferences → Plugins → "Enable KiCad API"**. It ships off.
 
-## Three layers
+## Layers
 
 | Layer | Needs | Gives you |
 |---|---|---|
@@ -152,6 +125,7 @@ For the live layer, enable the API server in KiCad:
 | **offline** | nothing | component positions, bboxes, nets, DRC, ERC, netlist, BOM |
 | **visual** | nothing | any board region rendered to PNG — the agent looks at the layout |
 | **live** | API server enabled | edit a board open in KiCad, with proper undo |
+| **footprints** | nothing | a datasheet → a hardcoded wizard script and a `.kicad_mod` |
 
 ## Use
 
@@ -188,8 +162,10 @@ kh exec place_filter.py                        # run a script against running Ki
 Pass `--pcb` / `--sch` to point at a project; otherwise the current directory is
 searched. All output is JSON.
 
-Footprint generation needs no CLI: hand the agent a datasheet screenshot, PDF or
-dimension table and it writes a hardcoded KiCad wizard script for that part.
+Footprint generation needs no CLI — hand the agent a datasheet screenshot, PDF or
+dimension table and it measures the drawing, writes a hardcoded wizard script,
+overlays the generated pads back onto the datasheet to prove they line up, and
+exports the `.kicad_mod`.
 
 ## The loop
 
@@ -203,7 +179,9 @@ kh drc       →  confirm nothing broke
 
 Step 4 is the whole point. A placement script that runs cleanly can still be
 visibly wrong — parts rotated 90° off, a filter in the wrong order, courtyards
-overlapping. Only the image catches that.
+overlapping. Only the image catches that. Footprints get the same treatment: the
+pads are drawn back over the datasheet and looked at, because a wizard script
+that exits 0 proves nothing about its geometry.
 
 ## Notes
 
@@ -216,26 +194,30 @@ overlapping. Only the image catches that.
 - **No ratsnest in renders** — SVG export omits airwires. Use the `unconnected`
   section of `kh drc` instead.
 - **No schematic editing API** — kipy's schematic module is present but
-  non-functional. Explained in `skills/kicad-harness/docs/CAPABILITIES.md`.
-  Schematics are edited as text.
+  non-functional, explained in `docs/CAPABILITIES.md`. Schematics are edited as
+  text.
 - **No built-in autorouter**, but Specctra DSN export / SES import both work
   headless from Python, so an external router can be driven with no clicks.
+- **No template fits an irregular land pattern.** USB-C, card edges and most
+  connectors need an explicit pad table, not a bent `PadArray`.
 
 ## Documentation
 
 - [`docs/SELF_ITERATION.md`](docs/SELF_ITERATION.md) — how the agent maintains
   this repo, and how to send a fix back
-- [`skills/kicad-harness/docs/CAPABILITIES.md`](skills/kicad-harness/docs/CAPABILITIES.md) —
-  what KiCad exposes, measured rather than assumed, including why the schematic
-  API that appears to exist in kipy's source does not actually work
-- [`skills/kicad-harness/docs/LIVE_API.md`](skills/kicad-harness/docs/LIVE_API.md) — the kipy object model
-- [`skills/kicad-harness/docs/RECIPES.md`](skills/kicad-harness/docs/RECIPES.md) — worked examples,
-  including authoring a `.kicad_sch` from scratch
-- [`skills/kicad-harness/docs/SCHEMATIC_EDITS.md`](skills/kicad-harness/docs/SCHEMATIC_EDITS.md) —
-  changing a schematic someone already drew, without wrecking the rest of it
-- [`skills/kicad-footprint-generate/docs/GUIDE.md`](skills/kicad-footprint-generate/docs/GUIDE.md) —
-  the footprint generation procedure, with `API_REFERENCE`, `VERIFICATION` and
-  `EXAMPLES` beside it
+- [`docs/CAPABILITIES.md`](docs/CAPABILITIES.md) — what KiCad exposes, measured
+  rather than assumed, including why the schematic API that appears to exist in
+  kipy's source does not actually work
+- [`docs/LIVE_API.md`](docs/LIVE_API.md) — the kipy object model
+- [`docs/RECIPES.md`](docs/RECIPES.md) — worked examples, including authoring a
+  `.kicad_sch` from scratch
+- [`docs/SCHEMATIC_EDITS.md`](docs/SCHEMATIC_EDITS.md) — changing a schematic
+  someone already drew, without wrecking the rest of it
+- [`docs/footprints/`](docs/footprints/) — the footprint side: `MEASUREMENT.md`
+  (getting exact dimensions out of a drawing), `GUIDE.md`, `API_REFERENCE.md`,
+  `VERIFICATION.md`, `ENVIRONMENT.md`, `EXAMPLES.md`
+- [`templates/`](templates/) — the official KiCad wizard blueprints (QFP, BGA,
+  QFN, FPC, connectors …)
 
 ## Cautions
 

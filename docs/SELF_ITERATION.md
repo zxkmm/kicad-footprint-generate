@@ -29,19 +29,19 @@ Anything that cost you time and would cost the next run the same time.
 
 | What you learned | Where it belongs |
 |---|---|
-| how to work a board / schematic with `kh` | `skills/kicad-harness/SKILL.md` |
-| measured KiCad behaviour, what the API can't do | `skills/kicad-harness/docs/CAPABILITIES.md` |
-| the kipy object model | `skills/kicad-harness/docs/LIVE_API.md` |
-| a worked example worth repeating | `skills/kicad-harness/docs/RECIPES.md` |
-| editing a schematic a human drew | `skills/kicad-harness/docs/SCHEMATIC_EDITS.md` |
+| a decision that changes how the agent works | `SKILL.md` |
+| measured KiCad behaviour, what the API can't do | `docs/CAPABILITIES.md` |
+| the kipy object model | `docs/LIVE_API.md` |
+| a worked example worth repeating | `docs/RECIPES.md` |
+| editing a schematic a human drew | `docs/SCHEMATIC_EDITS.md` |
 | a fix to the tool itself | `kicad_harness/` |
-| footprint math, pad rules, package conventions | `skills/kicad-footprint-generate/docs/` |
-| a reusable wizard blueprint | `skills/kicad-footprint-generate/templates/` |
+| footprint math, pad rules, package conventions | `docs/footprints/` |
+| a reusable wizard blueprint | `templates/` |
 | something broken you did **not** fix | `ISSUES.md`, with severity and what you'd do |
 
-Keep the SKILL.md files thin. They are read on every invocation — they hold the
-decisions ("look every id up", "always render and look"), and the details live in
-`docs/`.
+Keep `SKILL.md` thin. It is read on every invocation — it holds the decisions
+("look every id up", "always render and look", "measure the drawing"), and the
+details live in `docs/`.
 
 ## The loop, concretely
 

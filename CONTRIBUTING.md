@@ -17,7 +17,7 @@ Forking is fine and expected — pin a version, add house rules, whatever you ne
 
 PRs go to [`zxkmm/kicad-harness`](https://github.com/zxkmm/kicad-harness).
 An observation you are not fully sure about is still worth a PR — say so in the
-description. Half of the value in `skills/kicad-harness/docs/CAPABILITIES.md` is
+description. Half of the value in `docs/CAPABILITIES.md` is
 "we tried it, it does not work", which nobody can find by reading source.
 
 ## What a good PR looks like

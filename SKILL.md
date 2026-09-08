@@ -4,8 +4,10 @@ description: >
   Inspect, measure, render and edit KiCad boards and schematics from an agent.
   Gives you eyes (render any board region to PNG and look at it), hands (live
   IPC into a running KiCad -- no copy-pasting into the built-in console), and a
-  verdict (DRC/ERC as compact JSON). Use for placement, layout review,
-  positioning components, checking a board, or scripting schematic edits.
+  verdict (DRC/ERC as compact JSON). Also generates a footprint from a datasheet
+  (image, PDF or dimensions) when no library has the part. Use for placement,
+  layout review, positioning components, checking a board, scripting schematic
+  edits, or making a footprint.
 ---
 
 # KiCad Harness
@@ -31,12 +33,12 @@ or netlists — only this repo's own files.
 
 Findings about measured KiCad behaviour are the most valuable thing you can
 leave behind, because the next agent cannot guess them from source. Where each
-kind of finding belongs, and what not to commit: `../../docs/SELF_ITERATION.md`.
-Something broken you did not fix goes in `../../ISSUES.md`.
+kind of finding belongs, and what not to commit: `docs/SELF_ITERATION.md`.
+Something broken you did not fix goes in `ISSUES.md`.
 
 ---
 
-You are working on a real KiCad project. This harness gives you three layers.
+You are working on a real KiCad project. This harness gives you these layers.
 Reach for the lowest one that answers the question.
 
 | Layer | Needs | Use it for |
@@ -45,6 +47,7 @@ Reach for the lowest one that answers the question.
 | **offline** | nothing | positions, nets, bboxes, DRC, ERC, netlist, BOM |
 | **visual** | nothing | *seeing* the layout — verify placement actually looks right |
 | **live** | API server on | editing a board that is open in KiCad, right now |
+| **footprints** | nothing | making the part when no library has it — see below |
 
 ## Never invent a library identifier
 
@@ -250,16 +253,42 @@ Output is grouped by violation type with a bounded sample per type, because a
 board with 400 unconnected pads produces a report you cannot read otherwise.
 `total` is the true count; `truncated` says whether you are seeing all of them.
 
-## Generating footprints
+## Making a footprint the libraries do not have
 
-If a part has no footprint in any library, generating one from its datasheet is a
-separate job with its own skill — `kicad-footprint-generate`, which ships in this
-same repo at `../kicad-footprint-generate/SKILL.md`. Read that file and follow it
-rather than improvising pad math here. Come back to this harness once the
-`.kicad_mod` exists: `kh validate --footprints <lib:name>` confirms KiCad can see
-it, and `kh view` renders it in place on the board.
+`kh fp` came back with nothing usable, or the user handed you a datasheet: build
+the part. The output is a **hardcoded** KiCad Footprint Wizard script — every
+dimension baked in, nothing for the user to configure, runnable as-is — plus the
+`.kicad_mod` it produces, exported into a `.pretty` library so they are not
+forced to run the wizard themselves.
 
-This harness itself is about working with a project that already exists.
+The full procedure is `docs/footprints/GUIDE.md`. What decides the outcome:
+
+**1. Measure the drawing; do not eyeball it.** Render the datasheet at 600 dpi,
+scan for stroke centres, derive mm-per-pixel from one printed dimension, then
+cross-validate that scale against every other printed dimension. Prefer the
+"RECOMMENDED P.C.B. LAYOUT" page over mechanical views — they dimension from
+different datums and will not reconcile. `docs/footprints/MEASUREMENT.md`.
+
+**2. Pick a blueprint, or admit there isn't one.** `templates/` holds the
+official KiCad wizards — `qfp_wizard.py` for peripheral pins, `bga_wizard.py`
+for grid arrays, `PadArray.py` for the coordinate math. Irregular land patterns
+(USB-C, card edges, most connectors) fit **no** template: non-uniform pitch,
+mixed pad widths, mechanical anchors. Write an explicit pad table instead of
+bending `PadArray` around them. `docs/footprints/API_REFERENCE.md`.
+
+**3. Verify by looking, not by exiting 0.** A syntax check and a
+`BuildFootprint()` lifecycle run only prove the script *runs*. Dump every pad in
+mm, then **overlay the generated pads back onto the datasheet image** using the
+pixel mapping from step 1 and read the picture — the same rule as the placement
+loop above. `docs/footprints/VERIFICATION.md`.
+
+**4. Deliver honestly.** State the orientation and origin, list every dimension
+you **inferred** rather than read, and flag whatever the fab should check.
+`docs/footprints/ENVIRONMENT.md` covers where the script and the library go.
+
+Then carry on with the rest of this skill: `kh validate --footprints <lib:name>`
+confirms KiCad resolves the new id, and `kh view --refs <ref>` renders it in
+place next to its neighbours.
 
 ## What is not available
 
