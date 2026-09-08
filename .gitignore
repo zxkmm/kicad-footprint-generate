@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# harness output
+*.png
+*.svg
+*.net
+*.csv
+view.png
+
+# ... except the screenshots the README uses
+!docs/img/*.png
+
+# freerouting
+*freerouting*/
