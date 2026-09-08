@@ -18,7 +18,34 @@ Before writing the file, use `ls -d` or `find` to detect the existence of these 
 ls -d ~/.local/share/kicad/*/scripting/plugins/
 ```
 
+## 📤 Deliverables
+
+Ship **both**:
+
+1. **The wizard script**, copied into the detected plugins directory. Name the
+   file with underscores (`mc_314c_4p16_wizard.py`) so it is importable for
+   verification; hyphens are fine in `GetName()` / `GetValue()`.
+2. **A generated `.kicad_mod`**, written into a `.pretty` library beside the
+   datasheet. Most users want the footprint, not the generator — do not make
+   them run the wizard to get it. See
+   [Verification step E](VERIFICATION.md#e-export-a-kicad_mod).
+
+```text
+MyPart/
+├── datasheet.pdf
+├── my_part_wizard.py           # also copied to ~/.local/share/kicad/<ver>/scripting/plugins/
+└── MyPart.pretty/
+    └── My_Part_Footprint.kicad_mod
+```
+
+Delete any `__pycache__/` left behind by verification before handing over.
+
 ## 🚀 Deployment Instructions for User
+
+To add the `.kicad_mod` directly: **Preferences → Manage Footprint Libraries →
+add the `.pretty` folder**.
+
+To use the wizard instead:
 1. Open KiCad.
 2. Launch the **Footprint Editor**.
 3. Go to **File > Create Footprint...** (or click the Footprint Wizard icon).

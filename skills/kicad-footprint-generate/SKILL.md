@@ -36,11 +36,17 @@ Extract precise dimensions from provided inputs (images, PDFs, or descriptions).
 - Pin/Pad geometry (pitch, width, length).
 - Package body dimensions and Pin 1 orientation.
 - Thermal pad (EPad) requirements and courtyard clearances.
-*Refer to [Analysis Guide](docs/GUIDE.md#1-specification-analysis).*
+
+**Measure the drawing; do not eyeball it.** Render the datasheet at 600 dpi,
+scan for stroke centres, and derive mm-per-pixel from a printed dimension —
+then cross-validate that scale against every other printed dimension. Prefer
+the "RECOMMENDED P.C.B. LAYOUT" page over mechanical views.
+*Refer to [Measurement](docs/MEASUREMENT.md) and [Analysis Guide](docs/GUIDE.md#1-specification-analysis).*
 
 ### 2. Template Selection & Mapping
-Identify the package type (SOP, QFP, BGA, QFN, etc.) and map it to the corresponding template in `templates/`. 
-*Refer to [Templates Reference](docs/API_REFERENCE.md#template-directory-templates).*
+Identify the package type (SOP, QFP, BGA, QFN, etc.) and map it to the corresponding template in `templates/`.
+Irregular land patterns (connectors, USB-C, card edges) fit no template — write an explicit pad table instead.
+*Refer to [Templates Reference](docs/API_REFERENCE.md#template-directory-templates) and [Irregular Land Patterns](docs/GUIDE.md#5-irregular-land-patterns-connectors).*
 
 ### 3. Implementation (Hardcoded Logic)
 Generate a standalone Python script where all dimensions are hardcoded. 
@@ -51,11 +57,17 @@ Generate a standalone Python script where all dimensions are hardcoded.
 Before delivering the script, perform the mandatory verification steps:
 1. **Syntax Check**: `python3 <script>.py`
 2. **Lifecycle Test**: Run `BuildFootprint()` via CLI.
+3. **Geometry Dump**: print every pad in mm and check it against the datasheet.
+4. **Overlay**: draw the generated pads back onto the datasheet image using the
+   pixel mapping from step 1, then look at the result. Steps 1-2 only prove the
+   script runs; this is what proves it is right.
 *Refer to the full [Verification Workflow](docs/VERIFICATION.md).*
 
 ### 5. Deployment & Delivery
 - Deploy the script to the detected KiCad scripting directory.
+- Also export a ready-to-use `.kicad_mod` into a `.pretty` library beside the datasheet, so the user is not forced to run the wizard.
 - Provide clear run instructions to the user.
+- State the orientation and origin, list any dimension you **inferred** rather than read, and flag anything the fab should check.
 *Refer to [Environment & Deployment](docs/ENVIRONMENT.md).*
 
 ## 🔗 Putting the footprint on a board
@@ -66,6 +78,7 @@ confirms KiCad resolves the id, and `kh view --refs <ref>` renders the part in
 place so you can actually look at it next to its neighbours.
 
 ## 📚 Supporting Documentation
+- [Measurement](docs/MEASUREMENT.md) - Getting exact dimensions out of a drawing.
 - [Detailed Guide](docs/GUIDE.md) - Deep dive into the generation process.
 - [API & Templates](docs/API_REFERENCE.md) - KiCad Python API and blueprint mapping.
 - [Environment Setup](docs/ENVIRONMENT.md) - Path detection and installation.

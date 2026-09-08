@@ -88,7 +88,7 @@ kicad-harness/
 │   │   └── examples/
 │   └── kicad-footprint-generate/   # the datasheet -> footprint skill
 │       ├── SKILL.md
-│       ├── docs/                   # GUIDE, API_REFERENCE, ENVIRONMENT, VERIFICATION, EXAMPLES
+│       ├── docs/                   # MEASUREMENT, GUIDE, API_REFERENCE, ENVIRONMENT, VERIFICATION, EXAMPLES
 │       └── templates/              # official KiCad wizard blueprints (QFP, BGA, QFN, ...)
 ├── kicad_harness/                  # the Python package behind `kh`
 ├── docs/SELF_ITERATION.md          # how the agent maintains this repo

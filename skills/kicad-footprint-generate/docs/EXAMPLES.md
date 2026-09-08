@@ -568,3 +568,128 @@ XC7Z020_CLG484_Wizard().register()
 
 **Instruction to User**:
 "I have generated the `XC7Z020-2CLG484I-BGA-484` footprint script. It has been placed in `~/.local/share/kicad/9.0/scripting/plugins/`. You can now use the KiCad Footprint Wizard to generate the footprint."
+
+## Example 4: SOFNG MC-314C-4P16 — USB Type-C receptacle (16P / 12 pads)
+
+**Scenario**: User drops a 2-page vendor PDF in a directory and says "generate a
+KiCad footprint for this USB type C connector". Nothing else.
+
+This is the worked example for **irregular land patterns** and for the
+**measure-then-overlay** workflow. Unlike the BGA/QFN examples above, almost
+nothing here comes from a template.
+
+### What made it hard
+
+- Non-uniform pitch: 12 pads at `±3.20, ±2.40, ±1.75, ±1.25, ±0.75, ±0.25`.
+  The middle eight are on 0.50 mm pitch; the outer four are not.
+- Two pad widths: 0.60 mm where two contacts merge, 0.30 mm elsewhere.
+- Four **oblong plated slots** for the shell anchors, with *different lengths*
+  front (2.10 × 1.00 over a 1.70 × 0.60 slot) and rear (1.80 × 1.00 over
+  1.40 × 0.60).
+- The pad height was **never dimensioned** anywhere on the sheet.
+- The mechanical view and the land pattern disagreed: the mechanical view's
+  `0.80 + 4.00 + 1.20` did not close against the land pattern's
+  `0.40 + 4.00 + 2.10 = 6.50`. They measure from different datums. The land
+  pattern won.
+
+### Extraction
+
+Page 2 rendered at 600 dpi, then column-scanned for stroke centres
+(see [Measurement](MEASUREMENT.md)). Pairing thick runs gave 12 pads:
+
+```
+scale     = 6.40 mm / 558 px = 0.011470 mm/px
+validated = 4.80 → 4.794 | 11.20 → 11.206 | 4.00 → 4.003 | 2.10 → 2.099
+widths    = 52 px → 0.596 mm (0.60) | 26 px → 0.298 mm (0.30)
+centres   = -3.20 -2.40 -1.75 -1.25 -0.75 -0.25 +0.25 +0.75 +1.25 +1.75 +2.40 +3.20
+```
+
+Every copper-to-copper gap came out at exactly 0.20 mm — wide-to-wide,
+wide-to-narrow and narrow-to-narrow alike. That one invariant confirmed all
+twelve positions and both widths at once.
+
+The undimensioned pad height was then *derived*, not guessed: the drawing gives
+pad-bottom-to-anchor-centre = 0.40 and pad-top-to-anchor-centre measured 1.554,
+so height = 1.154 → **1.15 mm**, and it was reported to the user as inferred.
+
+### The distinctive code
+
+```python
+    # Datasheet pad map, left (-X) to right (+X).
+    #   x-key 'outer' -> +/- span_outer/2 (6.40)   'inner' -> +/- span_inner/2 (4.80)
+    #   x-key int n   -> +/- pitch * (n + 0.5)
+    PAD_MAP = [
+        (('outer', -1), True,  ['A1', 'B12'], 'GND'),
+        (('inner', -1), True,  ['A4', 'B9'],  'VBUS'),
+        ((3, -1),       False, ['A8'],        'SBU1'),
+        ((2, -1),       False, ['A5'],        'CC1'),
+        ((1, -1),       False, ['B7'],        'D-2'),
+        ((0, -1),       False, ['A6'],        'D+1'),
+        ((0, +1),       False, ['A7'],        'D-1'),
+        ((1, +1),       False, ['B6'],        'D+2'),
+        ((2, +1),       False, ['B8'],        'SBU2'),
+        ((3, +1),       False, ['B5'],        'CC2'),
+        (('inner', +1), True,  ['B4', 'A9'],  'VBUS'),
+        (('outer', +1), True,  ['B1', 'A12'], 'GND'),
+    ]
+
+    def _PadX(self, key):
+        pads = self.parameters['Pads']
+        index, sign = key
+        if index == 'outer': return int(sign * pads['span outer'] / 2)
+        if index == 'inner': return int(sign * pads['span inner'] / 2)
+        return int(sign * pads['pitch'] * (index + 0.5))
+
+    def BuildThisFootprint(self):
+        ...
+        # Pads hang off the body rear edge: bottom edge flush with -body_depth/2
+        pad_y = int(-half_depth - pad_h / 2.0)
+
+        for key, is_big, numbers, signal in self.PAD_MAP:
+            x = self._PadX(key)
+            w = pad_w_big if is_big else pad_w
+            for number in numbers:                 # merged contacts -> coincident pads
+                pad = self._SmdPad(w, pad_h)
+                pad.SetPosition(pcbnew.VECTOR2I(int(x), pad_y))
+                pad.SetNumber(number)
+                self.module.Add(pad)
+
+        # Shell anchors: oblong PTH, all on one net
+        for y, pad_len, drill_len in [(rear_y,  1.80mm, 1.40mm),
+                                      (front_y, 2.10mm, 1.70mm)]:
+            for sign in (-1, +1):
+                pad = self._SlotPad(shield_pad_w, pad_len, shield_drill_w, drill_len)
+                pad.SetPosition(pcbnew.VECTOR2I(int(sign * shield_x), int(y)))
+                pad.SetNumber("S1")
+                self.module.Add(pad)
+
+        self.module.SetAttributes(pcbnew.FP_THROUGH_HOLE)   # mixed SMD + plated slots
+```
+
+Result: 20 pad objects for 12 physical positions and 16 pin names — directly
+compatible with KiCad's stock `USB_C_Receptacle_USB2.0_16P` symbol.
+
+### Verification that actually caught things
+
+The syntax and lifecycle checks passed on the first run and proved nothing. The
+overlay ([step D](VERIFICATION.md#d-overlay-back-onto-the-datasheet--strongest-check))
+is what confirmed the footprint: red pad outlines and green drill slots drawn on
+the datasheet image, all landing exactly on the printed land pattern, with the
+courtyard enclosing everything.
+
+**Instruction to User** (note what is stated, not just what was built):
+
+> Footprint generated from the RECOMMENDED P.C.B. LAYOUT on page 2, verified by
+> overlaying the generated geometry back onto the drawing.
+>
+> - `MC-314C-4P16.pretty/USB_C_Receptacle_MC-314C-4P16.kicad_mod` — ready to use
+> - `mc_314c_4p16_wizard.py` — also deployed to `~/.local/share/kicad/10.0/scripting/plugins/`
+>
+> Origin = centre of the 11.20 × 6.50 body; −Y = solder tails, +Y = mating face
+> at the board edge; A1 leftmost.
+>
+> Two things worth flagging: **pad height 1.15 mm is inferred, not printed** —
+> measured 1.154 against dimensions the drawing does state. And the **0.20 mm
+> annular ring** on the shell slots is what the datasheet specifies; that is
+> thin, check it against your fab's minimum. This is a sink-board part, so the
+> board needs a cutout at the mating edge — outside the footprint.
